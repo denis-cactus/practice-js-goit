@@ -1,16 +1,33 @@
-/*
-  Створи список справ.
-  На сторінці є два інпути які має вводиться назва і текст задачі.
-  Після натискання на кнопку "Add" завдання додається до списку #task-list.
+// main.js
 
-  У кожної картки має бути кнопка "Delete", щоб можна було
-  прибрати завдання зі списку.
-  Список із завданнями має бути доступним після перезавантаження сторінки.
+import { refs } from './js/refs.js';
+import { addTask, deleteTask } from './js/tasks.js';
+import { renderTaskList } from './js/render-tasks.js';
+import { loadFromLocalStorage } from './js/local-storage-api.js';
+import './js/theme-switcher.js';
+refs.form.addEventListener('submit', evt => {
+  evt.preventDefault();
 
-  Розмітка картки задачі
-  <li class="task-list-item">
-      <button class="task-list-item-btn">Delete</button>
-      <h3>Заголовок</h3>
-      <p>Текст</p>
-  </li>
-*/
+  const taskName = evt.target.elements.taskName.value.trim();
+  const taskDescr = evt.target.elements.taskDescription.value.trim();
+
+  if (!taskName || !taskDescr) return;
+
+  addTask(taskName, taskDescr); // додаємо нове завдання
+
+  evt.target.reset();
+});
+
+refs.taskList.addEventListener('click', evt => {
+  if (evt.target.classList.contains('task-list-item-btn')) {
+    const taskIndex = evt.target.dataset.index;
+    deleteTask(taskIndex); // видаляємо завдання
+  }
+});
+
+function loadTasks() {
+  const tasks = loadFromLocalStorage();
+  renderTaskList(tasks); // завантажуємо завдання з localStorage
+}
+
+document.addEventListener('DOMContentLoaded', loadTasks);
